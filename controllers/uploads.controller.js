@@ -13,6 +13,8 @@ const { v4: uuidv4 } = require('uuid');
 const { updateImage } = require('../helpers/update-image');
 
 // MODELS
+const Rifa = require('../models/rifas.model')
+
 /** =====================================================================
  *  UPLOADS
 =========================================================================*/
@@ -22,7 +24,7 @@ const fileUpload = async(req, res = response) => {
     const id = req.params.id;
     const desc = req.query.desc || 'img';
 
-    const validType = ['products', 'logo', 'user', 'category'];
+    const validType = ['rifa', 'user'];
 
     // VALID TYPES
     if (!validType.includes(tipo)) {
@@ -63,10 +65,10 @@ const fileUpload = async(req, res = response) => {
     const path = `./uploads/${ tipo }/${ nameFile }`;
 
     // CONVERTIR A WEBP
-    if (tipo === 'products') {
+    if (tipo === 'rifa') {
 
         sharp(req.files.image.data)
-            .resize(300, 300)
+            .resize(600, 400)
             .webp({ equality: 75, effort: 6 })
             .toFile(path, (err, info) => {
 
@@ -141,83 +143,80 @@ const getImages = (req, res = response) => {
 /** =====================================================================
  *  DELETE IMAGES
 =========================================================================*/
-// const deleteImg = async(req, res = response) => {
+const deleteImg = async(req, res = response) => {
 
-//     try {
+    try {
 
-//         const uid = req.uid;
-//         const type = req.params.type;
-//         const id = req.params.id;
-//         const img = req.params.img;
+        const uid = req.uid;
+        const type = req.params.type;
+        const id = req.params.id;
+        const img = req.params.img;
 
-//         switch (type) {
-//             case 'products':
+        switch (type) {
+            case 'rifa':
 
-//                 // COMPROVAR QUE EL ID ES VALIDO
-//                 if (!ObjectId.isValid(id)) {
-//                     return res.status(404).json({
-//                         ok: false,
-//                         msg: 'Error en el ID del producto'
-//                     });
-//                 }
+                // COMPROVAR QUE EL ID ES VALIDO
+                if (!ObjectId.isValid(id)) {
+                    return res.status(404).json({
+                        ok: false,
+                        msg: 'Error en el ID de la rifa'
+                    });
+                }
 
-//                 const productDB = await Product.findById(id);
-//                 if (!productDB) {
-//                     return res.status(404).json({
-//                         ok: false,
-//                         msg: 'No existe ningun producto con este ID'
-//                     });
-//                 }
+                const rifaDB = await Rifa.findById(id);
+                if (!rifaDB) {
+                    return res.status(404).json({
+                        ok: false,
+                        msg: 'No existe ninguna rifa con este ID'
+                    });
+                }
 
-//                 const deleteImgProduct = await Product.updateOne({ _id: id }, { $pull: { img: { img } } });
-
-
-//                 // VERIFICAR SI SE ACTUALIZO
-//                 if (deleteImgProduct.nModified === 0) {
-//                     return res.status(400).json({
-//                         ok: false,
-//                         msg: 'No se pudo eliminar esta imagen, porfavor intente de nuevo'
-//                     });
-//                 }
-
-//                 // ELIMINAR IMAGEN DE LA CARPETA
-//                 const path = `./uploads/${ type }/${ img }`;
-//                 if (fs.existsSync(path)) {
-//                     // DELET IMAGE OLD
-//                     fs.unlinkSync(path);
-//                 }
-
-//                 const product = await Product.findById(id)
-//                     .populate('categoria')
-//                     .populate('tax')
-//                     .populate('subcategoria');
-
-//                 res.json({
-//                     ok: true,
-//                     product
-//                 });
-
-//                 break;
+                const deleteImgRifa = await Rifa.updateOne({ _id: id }, { $pull: { img: { img } } });
 
 
-//             default:
+                // VERIFICAR SI SE ACTUALIZO
+                if (deleteImgRifa.nModified === 0) {
+                    return res.status(400).json({
+                        ok: false,
+                        msg: 'No se pudo eliminar esta imagen, porfavor intente de nuevo'
+                    });
+                }
 
-//                 return res.status(400).json({
-//                     ok: false,
-//                     msg: 'Ha ocurrido un error, porfavor intente de nuevo'
-//                 });
-//                 break;
-//         }
+                // ELIMINAR IMAGEN DE LA CARPETA
+                const path = `./uploads/${ type }/${ img }`;
+                if (fs.existsSync(path)) {
+                    // DELET IMAGE OLD
+                    fs.unlinkSync(path);
+                }
 
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({
-//             ok: false,
-//             msg: 'Error inesperado, porfavor intente nuevamente'
-//         });
-//     }
+                const rifa = await Rifa.findById(id);
 
-// };
+                res.json({
+                    ok: true,
+                    rifa
+                });
+
+                break;
+
+
+            default:
+
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Ha ocurrido un error, porfavor intente de nuevo'
+                });
+                break;
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error inesperado, porfavor intente nuevamente'
+        });
+    }
+
+};
 
 /** =====================================================================
  *  DELETE IMAGES
@@ -227,5 +226,6 @@ const getImages = (req, res = response) => {
 // EXPORTS
 module.exports = {
     fileUpload,
-    getImages
+    getImages,
+    deleteImg
 };

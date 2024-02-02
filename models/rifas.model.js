@@ -2,16 +2,13 @@ const { Schema, model } = require('mongoose');
 
 const ImgSchema = Schema({
 
-    name: {
+    img: {
         type: String
     },
 
-    descripcion: {
-        type: String
-    },
-
-    cuenta: {
-        type: String
+    fecha: {
+        type: Date,
+        default: Date.now()
     }
 
 });
