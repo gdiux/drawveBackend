@@ -49,7 +49,8 @@ const getRifaId = async(req, res = response) => {
     try {
         const id = req.params.id;
 
-        const rifaDB = await Rifa.findById(id);
+        const rifaDB = await Rifa.findById(id)
+            .populate('admin', 'uid email name phone');
         if (!rifaDB) {
             return res.status(400).json({
                 ok: false,

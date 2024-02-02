@@ -26,7 +26,7 @@ router.get('/:id', validarJWT, getTicketId);
 /** =====================================================================
  *  GET SEARCH TICKET
 =========================================================================*/
-router.get('/search/:rifa/:busqueda', validarJWT, searchTicket);
+router.get('/search/:rifa/:busqueda', searchTicket);
 
 /** =====================================================================
  *  POST CREATE TICKET
