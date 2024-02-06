@@ -50,7 +50,7 @@ const getRifaId = async(req, res = response) => {
         const id = req.params.id;
 
         const rifaDB = await Rifa.findById(id)
-            .populate('admin', 'uid email name phone');
+            .populate('admin', 'uid email name phone empresa img');
         if (!rifaDB) {
             return res.status(400).json({
                 ok: false,

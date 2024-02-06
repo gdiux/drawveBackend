@@ -17,6 +17,10 @@ const UserSchema = Schema({
         type: String
     },
 
+    empresa: {
+        type: String
+    },
+
     password: {
         type: String,
         require: true

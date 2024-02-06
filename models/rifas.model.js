@@ -93,6 +93,11 @@ const RifasSchema = Schema({
         ref: 'User'
     },
 
+    abierta: {
+        type: Boolean,
+        default: true
+    },
+
     status: {
         type: Boolean,
         default: true

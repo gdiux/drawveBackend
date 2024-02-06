@@ -44,14 +44,7 @@ router.post('/', [
 /** =====================================================================
  *  PUT USER
 =========================================================================*/
-router.put('/:id', [
-        validarJWT,
-        check('email', 'El email es obligatorio').isEmail(),
-        check('name', 'El nombre es olbigatorio').not().isEmpty(),
-        validarCampos
-    ],
-    updateUser
-);
+router.put('/:id', validarJWT, updateUser);
 /** =====================================================================
  *  PUT USER
 =========================================================================*/

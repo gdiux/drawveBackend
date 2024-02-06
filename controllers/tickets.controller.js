@@ -15,13 +15,15 @@ const searchTicket = async(req, res = response) => {
         const regex = new RegExp(busqueda, 'i');
 
         const tickets = await Ticket.find({
-            $or: [
-                { nombre: regex },
-                { telefono: regex },
-                { cedula: regex },
-            ],
-            rifa
-        })
+                $or: [
+                    { nombre: regex },
+                    { telefono: regex },
+                    { cedula: regex },
+                ],
+                rifa
+            })
+            .populate('ruta')
+            .populate('vendedor');
 
         res.json({
             ok: true,
@@ -50,6 +52,7 @@ const getTicket = async(req, res) => {
 
         const [tickets, total, disponibles, apartados, pagados] = await Promise.all([
             Ticket.find(query)
+            .populate('ruta')
             .populate('vendedor')
             .sort(sort)
             .limit(hasta)
