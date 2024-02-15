@@ -57,6 +57,16 @@ const RifasSchema = Schema({
         require: true,
     },
 
+    promocion: {
+        type: Number,
+        default: 0
+    },
+
+    comision: {
+        type: Number,
+        default: 0
+    },
+
     numeros: {
         type: Number,
         require: true,

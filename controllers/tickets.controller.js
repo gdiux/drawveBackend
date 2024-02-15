@@ -1,6 +1,10 @@
 const { response } = require('express');
 
+const ObjectId = require('mongoose').Types.ObjectId;
+
 const Ticket = require('../models/ticket.model');
+const User = require('../models/users.model');
+const Rifa = require('../models/rifas.model');
 
 /** =====================================================================
  *  SEARCH TICKET FOR CLIENT
@@ -120,6 +124,94 @@ const getTicketId = async(req, res = response) => {
 };
 
 /** =====================================================================
+ *  CALCULATE PAYMENTS
+=========================================================================*/
+const getTicketPaid = async(req, res = response) => {
+
+    try {
+
+        const uid = req.uid;
+        const rifid = req.params.rifa;
+
+        let totalApartado = 0;
+        let totalPagado = 0;
+
+        // VERIFICAR SI ES UN ADMIN
+        const user = await User.findById(uid);
+        if (user.role !== 'ADMIN') {
+            return res.status(400).json({
+                ok: false,
+                msg: 'No tienes los privilegios necesarios para realizar esta consulta'
+            });
+
+        }
+
+        // VERIFICAR SI ES UN ADMIN
+        const rifa = await Rifa.findById(rifid);
+        if (uid !== (String)(new ObjectId(rifa.admin))) {
+            return res.status(401).json({
+                ok: false,
+                msg: 'No tienes los privilegios necesarios para realizar esta consulta'
+            });
+        }
+
+        const [apartados, pagados] = await Promise.all([
+            Ticket.find({ rifa: rifid, estado: 'Apartado' })
+            .populate('ruta')
+            .populate('vendedor'),
+            Ticket.find({ rifa: rifid, estado: 'Pagado' })
+            .populate('ruta')
+            .populate('vendedor'),
+        ]);
+
+        // CALCULATE TODOS LOS APARTADOS
+        for (let i = 0; i < apartados.length; i++) {
+            const apartado = apartados[i];
+
+            if (apartado.pagos && apartado.pagos.length > 0) {
+
+                for (const paid of apartado.pagos) {
+                    totalApartado += paid.monto;
+                }
+
+            }
+
+        }
+
+        // CALCULATE TODOS LOS APARTADOS
+        for (let i = 0; i < pagados.length; i++) {
+            const pagado = pagados[i];
+
+            if (pagado.pagos && pagado.pagos.length > 0) {
+
+                for (const paid of pagado.pagos) {
+                    totalPagado += paid.monto;
+                }
+            }
+
+        }
+
+        res.json({
+            ok: true,
+            apartados,
+            pagados,
+            totalApartado,
+            totalPagado
+        });
+
+
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Error inesperado, porfavor intente nuevamente'
+        });
+    }
+
+};
+
+/** =====================================================================
  *  CREATE TICKET
 =========================================================================*/
 const createTicket = async(req, res = response) => {
@@ -198,5 +290,6 @@ module.exports = {
     getTicketId,
     createTicket,
     updateTicket,
-    searchTicket
+    searchTicket,
+    getTicketPaid
 };

@@ -1,6 +1,8 @@
 const { response } = require('express');
 const bcrypt = require('bcryptjs');
 
+const short = require('short-uuid');
+
 const User = require('../models/users.model');
 
 /** ======================================================================
@@ -102,6 +104,9 @@ const createUsers = async(req, res = response) => {
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
         user.email = email;
+
+        // REFERAL CODE
+        user.referralCode = short.generate();
 
         // SAVE USER
         await user.save();

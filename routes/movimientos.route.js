@@ -1,5 +1,5 @@
 /** =====================================================================
- *  TICKET ROUTER 
+ *  MOVIMIENTOS ROUTER 
 =========================================================================*/
 const { Router } = require('express');
 const { check } = require('express-validator');
@@ -7,47 +7,54 @@ const { check } = require('express-validator');
 // MIDDLEWARES
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
+const { getMovimientos, getMovimientoId, createMovimiento, updateMovimiento, deleteMovimiento } = require('../controllers/movimientos.controller');
 
 // CONTROLLERS
-const { getTicket, getTicketId, createTicket, updateTicket, searchTicket, getTicketPaid } = require('../controllers/tickets.controller');
 
 const router = Router();
 
 /** =====================================================================
- *  POST TICKETS
+ *  POST MOVIMIENTOS
 =========================================================================*/
-router.post('/query', getTicket);
+router.post('/query', validarJWT, getMovimientos);
+/** =====================================================================
+ *  POST MOVIMIENTOS
+=========================================================================*/
 
 /** =====================================================================
- *  GET TICKET ID
+ *  GET MOVIMIENTO ID
 =========================================================================*/
-router.get('/:id', validarJWT, getTicketId);
+router.get('/:id', validarJWT, getMovimientoId);
+/** =====================================================================
+ *  GET MOVIMIENTO ID
+=========================================================================*/
 
 /** =====================================================================
- *  GET TICKET INGRESOS
-=========================================================================*/
-router.get('/ingresos/:rifa', validarJWT, getTicketPaid);
-
-/** =====================================================================
- *  GET SEARCH TICKET
-=========================================================================*/
-router.get('/search/:rifa/:busqueda', searchTicket);
-
-/** =====================================================================
- *  POST CREATE TICKET
+ *  POST CREATE MOVIMIENTO
 =========================================================================*/
 router.post('/', [
         validarJWT,
+        check('descripcion', 'La descripcion es obligatoria').not().isEmpty(),
         check('monto', 'El monto es olbigatorio').not().isEmpty(),
+        check('type', 'El tipo es olbigatorio').not().isEmpty(),
+        check('rifa', 'La rifa es olbigatoria').isMongoId(),
         validarCampos
     ],
-    createTicket
+    createMovimiento
 );
+/** =====================================================================
+ *  POST CREATE MOVIMIENTO
+=========================================================================*/
 
 /** =====================================================================
- *  PUT TICKET
+ *  PUT MOVIMIENTO
 =========================================================================*/
-router.put('/:id', validarJWT, updateTicket);
+router.put('/:id', validarJWT, updateMovimiento);
+
+/** =====================================================================
+ *  DELETE MOVIMIENTO
+=========================================================================*/
+router.delete('/:moid', validarJWT, deleteMovimiento);
 
 // EXPORT
 module.exports = router;

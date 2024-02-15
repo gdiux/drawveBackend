@@ -48,7 +48,20 @@ const UserSchema = Schema({
     fecha: {
         type: Date,
         default: Date.now
-    }
+    },
+
+    referralCode: {
+        type: String
+    },
+
+    referredBy: {
+        type: String
+    },
+
+    walletBalance: {
+        type: Number,
+        default: 0
+    },
 
 });
 
