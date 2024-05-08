@@ -135,6 +135,7 @@ const getTicketPaid = async(req, res = response) => {
 
         let totalApartado = 0;
         let totalPagado = 0;
+        let pendientes = [];
 
         // VERIFICAR SI ES UN ADMIN
         const user = await User.findById(uid);
@@ -157,9 +158,11 @@ const getTicketPaid = async(req, res = response) => {
 
         const [apartados, pagados] = await Promise.all([
             Ticket.find({ rifa: rifid, estado: 'Apartado' })
+            .populate('pagos.user')
             .populate('ruta')
             .populate('vendedor'),
             Ticket.find({ rifa: rifid, estado: 'Pagado' })
+            .populate('pagos.user')
             .populate('ruta')
             .populate('vendedor'),
         ]);
@@ -172,6 +175,9 @@ const getTicketPaid = async(req, res = response) => {
 
                 for (const paid of apartado.pagos) {
                     totalApartado += paid.monto;
+                    if (paid.estado === 'Pendiente') {
+                        pendientes.push(apartado);
+                    }
                 }
 
             }
@@ -186,6 +192,9 @@ const getTicketPaid = async(req, res = response) => {
 
                 for (const paid of pagado.pagos) {
                     totalPagado += paid.monto;
+                    if (paid.estado === 'Pendiente') {
+                        pendientes.push(apartado);
+                    }
                 }
             }
 
@@ -195,6 +204,7 @@ const getTicketPaid = async(req, res = response) => {
             ok: true,
             apartados,
             pagados,
+            pendientes,
             totalApartado,
             totalPagado
         });

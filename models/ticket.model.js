@@ -6,8 +6,18 @@ const PagosSchema = Schema({
         type: String
     },
 
+    estado: {
+        type: String,
+        default: 'Confirmado'
+    },
+
     monto: {
         type: Number
+    },
+
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
 
     fecha: {
