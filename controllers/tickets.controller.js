@@ -272,20 +272,12 @@ const updateTicket = async(req, res = response) => {
         // VALIDATE TICKET
         let {...campos } = req.body;
 
-        console.log(campos);
-
         // UPDATE
         await Ticket.findByIdAndUpdate(tid, campos, { new: true, useFindAndModify: false });
 
         const ticketUpdate = await Ticket.findById(tid)
             .populate('ruta')
             .populate('vendedor');
-
-        console.log('-----------------------------------------------------------');
-        console.log('-----------------------------------------------------------');
-        console.log('-----------------------------------------------------------');
-
-        console.log(ticketUpdate);
 
         res.json({
             ok: true,
