@@ -184,7 +184,7 @@ const getTicketPaid = async(req, res = response) => {
 
         }
 
-        // CALCULATE TODOS LOS APARTADOS
+        // CALCULATE TODOS LOS PAGADOS
         for (let i = 0; i < pagados.length; i++) {
             const pagado = pagados[i];
 
@@ -193,7 +193,7 @@ const getTicketPaid = async(req, res = response) => {
                 for (const paid of pagado.pagos) {
                     totalPagado += paid.monto;
                     if (paid.estado === 'Pendiente') {
-                        pendientes.push(apartado);
+                        pendientes.push(pagado);
                     }
                 }
             }
@@ -272,12 +272,20 @@ const updateTicket = async(req, res = response) => {
         // VALIDATE TICKET
         let {...campos } = req.body;
 
+        console.log(campos);
+
         // UPDATE
         await Ticket.findByIdAndUpdate(tid, campos, { new: true, useFindAndModify: false });
 
         const ticketUpdate = await Ticket.findById(tid)
             .populate('ruta')
             .populate('vendedor');
+
+        console.log('-----------------------------------------------------------');
+        console.log('-----------------------------------------------------------');
+        console.log('-----------------------------------------------------------');
+
+        console.log(ticketUpdate);
 
         res.json({
             ok: true,
